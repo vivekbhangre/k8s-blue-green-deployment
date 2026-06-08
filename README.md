@@ -9,6 +9,19 @@ This repository provides a comprehensive guide, architectural overview, and the 
 > 
 > **💡 Scaling Up:** If you are deploying this on a cluster with **multiple worker nodes** or using a managed Kubernetes service (like AWS EKS, GCP GKE, etc.), it is highly recommended to change the Service `type` in the YAML files below from `NodePort` to `LoadBalancer` to automatically distribute traffic across your nodes.
 
+### 🔐 Prerequisite: AWS Security Group Configuration (Inbound Ports)
+Because we are using `NodePort` services on custom EC2 instances, AWS will block outside web traffic by default. Before attempting to access your Blue or Green applications via the browser, you must explicitly open the NodePort ranges in your Worker Node's security group.
+
+1. Go to your **AWS EC2 Dashboard**.
+2. Select your **Worker Node** (`k8s-worker`) instance.
+3. Click on the **Security** tab at the bottom and click on the associated **Security Group**.
+4. Click **Edit inbound rules** and add the following two rules:
+   * **Type:** Custom TCP | **Port range:** `30080` | **Source:** `0.0.0.0/0` *(For End-User Live Traffic)*
+   * **Type:** Custom TCP | **Port range:** `30081` | **Source:** `0.0.0.0/0` *(For QA/Testing Traffic)*
+5. Click **Save rules**.
+
+*(Warning: If you skip this step, your Kubernetes deployment will succeed, but your browser connections to the public IP will simply time out!)*
+
 ---
 
 ## 🧠 Core Concepts & Definitions
