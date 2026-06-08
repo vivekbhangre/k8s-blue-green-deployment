@@ -215,22 +215,22 @@ This section contains visual verification of the Blue-Green deployment process, 
 ### 2. The Blue Phase (Current Production)
 *Verification that the initial version is stable and serving live traffic.*
 * **The Terminal State:** Terminal output of `kubectl get pods,svc` showing the blue pods running and the `webapp-live-service` bound to port `30080`.
-<img width="958" height="322" alt="2" src="https://github.com/user-attachments/assets/fd7a4bd0-7c7c-4a3a-b781-9ce2b9730149" />
+<img width="958" height="322" alt="2" src="https://github.com/user-attachments/assets/fd7a4bd0-7c7c-4a3a-b781-9ce2b9730149" /><br>
 * **The Live Browser:** The web browser hitting the Worker Node's Public IP on port `30080` (displaying the Blue application).
-<img width="1919" height="1079" alt="2_1" src="https://github.com/user-attachments/assets/ccbbdcf0-9b66-4dbe-9022-e1afb791a01f" />
+<img width="1919" height="1079" alt="2_1" src="https://github.com/user-attachments/assets/ccbbdcf0-9b66-4dbe-9022-e1afb791a01f" /><br>
 ### 3. The Green Phase (Isolated Staging)
 *Verification that the new code is deployed successfully without impacting live users.*
 * **The Parallel Pods:** Terminal output of `kubectl get pods -o wide` showing all four pods (2 blue, 2 green) running simultaneously on the worker node.
-<img width="1605" height="409" alt="3" src="https://github.com/user-attachments/assets/66bc264a-f847-42eb-b85f-0d29d097798e" />
+<img width="1605" height="409" alt="3" src="https://github.com/user-attachments/assets/66bc264a-f847-42eb-b85f-0d29d097798e" /><br>
 * **The QA Browser:** The web browser hitting the isolated testing port `30081` (displaying the Green application).
 <img width="1919" height="1079" alt="3_1" src="https://github.com/user-attachments/assets/e176cbcf-55c0-4f22-b141-95468c3b2560" /><br>
 ### 4. The Zero-Downtime Cutover (The Magic Moment)
 *Proof of the seamless traffic shift.*
-* **The Configuration Switch:** Terminal output showing the execution of `kubectl apply -f live-service.yml` after changing the selector from `v1` to `v2`.
-<img width="773" height="1079" alt="4" src="https://github.com/user-attachments/assets/78bb9835-56f1-42ed-8728-27025e7da82e" />
-<img width="729" height="118" alt="4_1" src="https://github.com/user-attachments/assets/e94ae642-299f-44eb-af4e-c925d7ef3d5b" />
+* **The Configuration Switch:** Terminal output showing the execution of `kubectl apply -f live-service.yml` after changing the selector from `v1` to `v2`.<br>
+<img width="773" height="1079" alt="4" src="https://github.com/user-attachments/assets/78bb9835-56f1-42ed-8728-27025e7da82e" /> <br>
+<img width="729" height="118" alt="4_1" src="https://github.com/user-attachments/assets/e94ae642-299f-44eb-af4e-c925d7ef3d5b" /> <br>
 * **The Final Browser Proof:** The web browser hitting the original live production port `30080`, now displaying the Green application, proving the traffic successfully swung over.
-<img width="1917" height="1079" alt="5" src="https://github.com/user-attachments/assets/e8aab4fc-4828-4ab7-ac84-189b18de6650" />
+<img width="1917" height="1079" alt="5" src="https://github.com/user-attachments/assets/e8aab4fc-4828-4ab7-ac84-189b18de6650" /><br>
 ## 🎯 Key Learnings from this Architecture
 Through implementing this deployment model, several core DevOps concepts were practically validated:
 * **Decoupling Deployment from Release:** Uploading new code to servers (deployment) and giving users access to that code (release) are two completely separate operational phases.
