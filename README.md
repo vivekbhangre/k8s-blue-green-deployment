@@ -2,6 +2,13 @@
 
 This repository provides a comprehensive guide, architectural overview, and the exact native Kubernetes manifest files required to implement a **Blue-Green Deployment** strategy. This release pattern completely decouples application deployment from traffic routing to achieve zero-downtime upgrades and rapid, risk-free rollbacks.
 
+> **⚠️ Infrastructure Context (Why NodePort instead of LoadBalancer?):**
+> This specific configuration is designed for a minimal `kubeadm` learning environment consisting of exactly **1 Control Plane (Master) Node and 1 Worker Node** running on basic cloud instances. 
+> 
+> Because i only have a single worker node and are not using a native Cloud Controller Manager, attempting to use a `LoadBalancer` service type would leave the external IP stuck in a `<pending>` state indefinitely. Therefore, this runbook explicitly uses `type: NodePort` to expose the applications directly on our single Worker Node's Public IP using high-range ports (e.g., `30080` for live traffic, `30081` for testing).
+> 
+> **💡 Scaling Up:** If you are deploying this on a cluster with **multiple worker nodes** or using a managed Kubernetes service (like AWS EKS, GCP GKE, etc.), it is highly recommended to change the Service `type` in the YAML files below from `NodePort` to `LoadBalancer` to automatically distribute traffic across your nodes.
+
 ---
 
 ## 🧠 Core Concepts & Definitions
@@ -73,12 +80,13 @@ kind: Service
 metadata:
   name: webapp-live-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     version: v1
   ports:
   - port: 80
     targetPort: 8080
+    nodePort: 30080
 ```
 Apply these initial configurations to your control plane:
 ```bash
@@ -142,7 +150,7 @@ spec:
   ports:
   - port: 80
     targetPort: 8080
-    nodePort: 31785
+    nodePort: 30081
 ```
 Deploy the testing endpoint:
 ```bash
@@ -161,12 +169,13 @@ kind: Service
 metadata:
   name: webapp-live-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
-    version: v2 # Switched from v1 to v2 to instantaneously swing traffic
+    version: v2 # Switched from v1 to v2 to instantaneously swing traffic!
   ports:
   - port: 80
     targetPort: 8080
+    nodePort: 30080
 ```
 Apply the updated live routing configuration:
 <br>
